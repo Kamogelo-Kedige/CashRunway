@@ -70,13 +70,23 @@
     -fx-border-width: 0 0 1 0;
 }
 
-/* Trend chart — filled area with a soft gradient under the line */
-.trend-chart .chart-series-area-line {
+/* Trend chart  filled area with a soft gradient under the line.
+   Series 0 (balance) and series 1 (deposits) are styled separately
+   so the two lines are visually distinguishable, not just labelled
+   in the legend. */
+.trend-chart .series0 .chart-series-area-line {
     -fx-stroke: #003DA5;
     -fx-stroke-width: 2.5px;
 }
-.trend-chart .chart-series-area-fill {
+.trend-chart .series0 .chart-series-area-fill {
     -fx-fill: linear-gradient(to bottom, rgba(0,61,165,0.35), rgba(0,61,165,0.02));
+}
+.trend-chart .series1 .chart-series-area-line {
+    -fx-stroke: #1E8449;
+    -fx-stroke-width: 2px;
+}
+.trend-chart .series1 .chart-series-area-fill {
+    -fx-fill: linear-gradient(to bottom, rgba(30,132,73,0.30), rgba(30,132,73,0.02));
 }
 .chart-plot-background { -fx-background-color: #FAFBFC; }
 .chart-vertical-grid-lines, .chart-horizontal-grid-lines { -fx-stroke: #EEF0F3; }

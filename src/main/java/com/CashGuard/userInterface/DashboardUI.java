@@ -76,8 +76,6 @@ public class DashboardUI
 
     private static HBox buildRiskRow(DashboardSummary summary) {
         VBox riskCard = buildRiskCard(summary);
-        Label action = new Label(summary.recommendedAction());
-        action.getStyleClass().addAll("kpi-value", "action-" + summary.riskLevel().toLowerCase().replace(" ", "-"));
 
         HBox kpiCards = new HBox(12,
                 buildKpiCard("Current balance", "R" + String.format("%,.0f", summary.currentBalance())),
@@ -115,10 +113,11 @@ public class DashboardUI
 
         String hoursText = summary.hoursToNoCash() < 0
                 ? "hours to empty: N/A"
-                : "hours to empty: " + Math.round(summary.hoursToNoCash()) + "h";
+                : summary.riskLevel().equalsIgnoreCase("Critical")
+                  ? "hours to empty: < 24h"
+                  : "hours to empty: " + Math.round(summary.hoursToNoCash());
 
-        // this is the second line you were asking about — replaces the
-        // old plain "kpi-sub"-styled hours label
+
         Label hours = new Label(hoursText);
         hours.getStyleClass().addAll("hours-to-empty", "action-" + summary.riskLevel().toLowerCase().replace(" ", "-"));
 
@@ -153,19 +152,27 @@ public class DashboardUI
         });
 
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Closing balance (R)");
+        yAxis.setLabel("Amount (R)");
 
         AreaChart<Number, Number> chart = new AreaChart<>(xAxis, yAxis);
-        chart.setTitle("30-day balance trend");
-        chart.setLegendVisible(false);
+        chart.setTitle("30-day balance & deposit trend");
+        chart.setLegendVisible(true);
         chart.setCreateSymbols(false);
         chart.getStyleClass().add("trend-chart");
 
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        XYChart.Series<Number, Number> balanceSeries = new XYChart.Series<>();
+        balanceSeries.setName("Closing balance");
         for (Map.Entry<LocalDate, Double> entry : summary.balanceTrend().entrySet()) {
-            series.getData().add(new XYChart.Data<>(entry.getKey().getDayOfMonth(), entry.getValue()));
+            balanceSeries.getData().add(new XYChart.Data<>(entry.getKey().getDayOfMonth(), entry.getValue()));
         }
-        chart.getData().add(series);
+
+        XYChart.Series<Number, Number> depositSeries = new XYChart.Series<>();
+        depositSeries.setName("Deposits");
+        for (Map.Entry<LocalDate, Double> entry : summary.depositTrend().entrySet()) {
+            depositSeries.getData().add(new XYChart.Data<>(entry.getKey().getDayOfMonth(), entry.getValue()));
+        }
+
+        chart.getData().addAll(balanceSeries, depositSeries);
 
         VBox panel = new VBox(chart);
         panel.getStyleClass().add("card");
@@ -193,7 +200,11 @@ public class DashboardUI
         series.getData().add(new XYChart.Data<>("R200", d.r200()));
         chart.getData().add(series);
 
-        VBox panel = new VBox(chart);
+        // Grand total across all denominations
+        Label total = new Label("Total cash dispensed: R" + String.format("%,.0f", d.total()));
+        total.getStyleClass().add("kpi-sub");
+
+        VBox panel = new VBox(6, chart, total);
         panel.getStyleClass().add("card");
         HBox.setHgrow(panel, Priority.ALWAYS);
         return panel;

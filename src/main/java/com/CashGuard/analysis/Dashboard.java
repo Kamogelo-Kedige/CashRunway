@@ -37,6 +37,7 @@ public class Dashboard {
                 denominationAnalyzer.totalByDenomination(atm),
                 trendAnalyzer.dailyWithdrawalSeries(atm),
                 trendAnalyzer.dailyBalanceSeries(atm),
+                trendAnalyzer.dailyDepositSeries(atm),
                 warnings
         );
 

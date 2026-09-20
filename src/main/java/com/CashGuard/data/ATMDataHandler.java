@@ -75,6 +75,8 @@ public class ATMDataHandler
                 Double.parseDouble(tokens[7]),
                 Double.parseDouble(tokens[8])
         ));
+
+        transaction.setDeposits(Double.parseDouble(tokens[9]));
         transaction.setClosingBalance(Double.parseDouble(tokens[10]));
         transaction.setDowntime(Boolean.parseBoolean(tokens[11]));
         transaction.setPayday(Boolean.parseBoolean(tokens[12]));

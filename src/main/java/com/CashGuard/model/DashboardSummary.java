@@ -19,5 +19,6 @@ public record DashboardSummary(String atmId,
                                Denomination denominationTotals,
                                Map<LocalDate, Double> withdrawalTrend,
                                Map<LocalDate, Double> balanceTrend,
+                               Map<LocalDate, Double> depositTrend,
                               List<Warning> recentWarnings)
 { }

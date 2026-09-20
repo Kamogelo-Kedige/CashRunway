@@ -50,5 +50,27 @@ public class TrendAnalyser
             }
             return closingBalanceSeries;
         }
+
+
+    /**
+     *
+     * Cash customers deposited back into the ATM each day
+     *
+     * @param atm
+     * @return Returns a date to deposit amount map, in date order
+     */
+    public Map<LocalDate, Double> dailyDepositSeries(ATM atm) {
+        List<ATMDayLog> history = atm.getAtmTransactionHistory();
+
+        if (history == null || history.isEmpty()) {
+            throw new IllegalStateException("Cannot build a trend with no history for " + atm.getId());
+        }
+
+        Map<LocalDate, Double> depositSeries = new LinkedHashMap<>();
+        for (ATMDayLog dayRecord : history) {
+            depositSeries.put(dayRecord.getDate(), dayRecord.getDeposits());
+        }
+        return depositSeries;
     }
+}
 
