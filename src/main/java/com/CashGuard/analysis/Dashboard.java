@@ -2,7 +2,7 @@ package com.CashGuard.analysis;
 
 import com.CashGuard.model.ATM;
 import com.CashGuard.model.DashboardSummary;
-import com.CashGuard.model.RiskSnapshot;
+import com.CashGuard.model.Warning;
 
 import java.util.List;
 
@@ -23,13 +23,13 @@ public class Dashboard {
         double currentBalance = atm.getLatestRecord().getClosingBalance();
         double percentOfCapacity = (currentBalance / atm.getMaxCashCapacity()) * 100;
         String riskLevel = predictor.determineRiskLevel(atm);
-        List<RiskSnapshot> warnings = predictor.lastFiveWarnings(atm);
+        List<Warning> warnings = predictor.lastFiveWarnings(atm);
 
         return new DashboardSummary(
                 atm.getId(),
                 atm.getLocation(),
                 predictor.determineRiskLevel(atm),
-                predictor.predictHoursToEmpty(atm),
+                predictor.predictHoursToNoCash(atm),
                 currentBalance,
                 percentOfCapacity,
                 recommendedAction(riskLevel),

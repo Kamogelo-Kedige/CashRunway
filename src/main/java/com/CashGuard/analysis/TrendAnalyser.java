@@ -1,7 +1,7 @@
 package com.CashGuard.analysis;
 
 import com.CashGuard.model.ATM;
-import com.CashGuard.model.ATMDayTransaction;
+import com.CashGuard.model.ATMDayLog;
 
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
@@ -18,7 +18,7 @@ public class TrendAnalyser
          * @param atm
          */
         public Map<LocalDate, Double> dailyWithdrawalSeries(ATM atm) {
-            List<ATMDayTransaction> history = atm.getAtmTransactionHistory();
+            List<ATMDayLog> history = atm.getAtmTransactionHistory();
 
             if (history == null || history.isEmpty()) {
                 throw new IllegalStateException("Cannot build a trend with no history for " + atm.getId());
@@ -27,7 +27,7 @@ public class TrendAnalyser
             //Linked hashmap to preserve order in which the transactions were performed
             //get withdrawal amounts for each date
             Map<LocalDate, Double> withdrawalSeries = new LinkedHashMap<>();
-            for (ATMDayTransaction dayRecord : history) {
+            for (ATMDayLog dayRecord : history) {
                 withdrawalSeries.put(dayRecord.getDate(), dayRecord.getWithdrawalAmount());
             }
             return withdrawalSeries;
@@ -37,7 +37,7 @@ public class TrendAnalyser
          * Returns a date to closing balance amount map, in date order.
          */
         public Map<LocalDate, Double> dailyBalanceSeries(ATM atm) {
-            List<ATMDayTransaction> history = atm.getAtmTransactionHistory();
+            List<ATMDayLog> history = atm.getAtmTransactionHistory();
 
             if (history == null || history.isEmpty()) {
                 throw new IllegalStateException("Cannot build a trend with no history for " + atm.getId());
@@ -45,7 +45,7 @@ public class TrendAnalyser
 
             //get closing balances for each date
             Map<LocalDate, Double> closingBalanceSeries = new LinkedHashMap<>();
-            for (ATMDayTransaction dayRecord : history) {
+            for (ATMDayLog dayRecord : history) {
                 closingBalanceSeries.put(dayRecord.getDate(), dayRecord.getClosingBalance());
             }
             return closingBalanceSeries;

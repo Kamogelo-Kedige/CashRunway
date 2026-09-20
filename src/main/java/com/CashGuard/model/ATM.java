@@ -11,7 +11,7 @@ public class ATM
     private String  id;
     private String location;
     private double maxCashCapacity; // max amount of cash the ATM can hold
-    private List<ATMDayTransaction> atmTransactionHistory;
+    private List<ATMDayLog> atmTransactionHistory;
 
     /**
      * No args constructor
@@ -26,7 +26,7 @@ public class ATM
      * @param maxCashCapacity
      * @param atmTransactionHistory
      */
-    public ATM(String id, String location, double maxCashCapacity, List<ATMDayTransaction> atmTransactionHistory) {
+    public ATM(String id, String location, double maxCashCapacity, List<ATMDayLog> atmTransactionHistory) {
         this.id = id;
         this.location = location;
         this.maxCashCapacity = maxCashCapacity;
@@ -34,7 +34,6 @@ public class ATM
     }
 
     //Getter and Setter Pairs
-
     public String getId() {
         return id;
     }
@@ -49,11 +48,8 @@ public class ATM
         return maxCashCapacity;
     }
 
-    public void setMaxCashCapacity(double maxCashCapacity) {
-        this.maxCashCapacity = maxCashCapacity;
-    }
 
-    public List<ATMDayTransaction> getAtmTransactionHistory() {
+    public List<ATMDayLog> getAtmTransactionHistory() {
         return atmTransactionHistory;
     }
 
@@ -61,7 +57,7 @@ public class ATM
      * Returns the most recent day recorded for this ATM.
      * Used by the predictor to know the "current" balance.
      */
-    public ATMDayTransaction getLatestRecord() {
+    public ATMDayLog getLatestRecord() {
 
         if (atmTransactionHistory == null || atmTransactionHistory.isEmpty()) {
             return null;

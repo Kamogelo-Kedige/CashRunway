@@ -2,7 +2,7 @@ package com.CashGuard.userInterface;
 
 import com.CashGuard.model.DashboardSummary;
 import com.CashGuard.model.Denomination;
-import com.CashGuard.model.RiskSnapshot;
+import com.CashGuard.model.Warning;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
@@ -20,7 +20,8 @@ import java.util.Objects;
  * Builds the ATM dashboard screen.
  * Every method here only ever reads from a DashboardSummary
  */
-public class DashboardUI {
+public class DashboardUI
+{
 
     private static Map<String, DashboardSummary> summariesByAtm;
     private static VBox contentRoot; // the swappable middle section
@@ -205,7 +206,7 @@ public class DashboardUI {
         VBox panel = new VBox(8, header);
         panel.getStyleClass().add("card");
 
-        List<RiskSnapshot> warnings = summary.recentWarnings();
+        List<Warning> warnings = summary.recentWarnings();
 
         if (warnings == null || warnings.isEmpty()) {
             Label placeholder = new Label("No warnings to display.");
@@ -215,8 +216,8 @@ public class DashboardUI {
         }
 
         VBox list = new VBox(8);
-        for (RiskSnapshot snap : warnings) {
-            Label entry = new Label(snap.date() + "  —  " + snap.message());
+        for (Warning snap : warnings) {
+            Label entry = new Label(snap.date() + ": " + snap.message());
             entry.getStyleClass().addAll("warning-entry", "warning-" + severityOf(snap.message()));
             list.getChildren().add(entry);
         }

@@ -1,8 +1,8 @@
 package com.CashGuard.analysis;
 
 import com.CashGuard.model.ATM;
-import com.CashGuard.model.ATMDayTransaction;
-import com.CashGuard.model.RiskSnapshot;
+import com.CashGuard.model.ATMDayLog;
+import com.CashGuard.model.Warning;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,13 +13,17 @@ import java.util.stream.Collectors;
  * Predicts how soon an ATM is likely to run out of money based on its recent 3-day behaviour
  * Then assigns a risk level
  */
-public class CashShortagePredictor {
+public class CashShortagePredictor
+{
 
     // Number of recent days used to calculate average withdrawals
     private static final int WINDOW_DAYS = 3;
 
     // If cash falls below 15% of capacity, the ATM has Critical cash levels
     private static final double SAFETY_PERCENTAGE = 15.0;
+
+    //Percentage thresholds to fire a cash running out warning
+    private static final double[] WARNING_PERCENTAGES = {50.0, 25.0, 15.0};
 
 
     /**
@@ -29,7 +33,7 @@ public class CashShortagePredictor {
      */
     public double calculateRecentAverage(ATM atm)
     {
-        List<ATMDayTransaction> atmHistory = atm.getAtmTransactionHistory();
+        List<ATMDayLog> atmHistory = atm.getAtmTransactionHistory();
         int historySize = atmHistory.size();
 
         //Get the starting index for the latest 3-day window
@@ -51,29 +55,30 @@ public class CashShortagePredictor {
         return average;
     }
 
-    public double calculateWithdrawalDemandMultiplier(ATM atm, ATMDayTransaction day)
+    public double calculateWithdrawalDemandMultiplier(ATM atm, ATMDayLog day)
     {
-        List<ATMDayTransaction> atmHistory = atm.getAtmTransactionHistory();
+        List<ATMDayLog> atmHistory = atm.getAtmTransactionHistory();
 
         //normal typical days
         double normalDaysTotal = 0;
         int normalDaysCount = 0;
 
-        //Special days like payday, holidays or month end
+        //Special days including payday, holidays or month end
         double specialDaysTotal = 0;
         int specialDaysCount = 0;
 
-        for(ATMDayTransaction atmDayTransaction : atmHistory)
+        for(ATMDayLog atmDayLog : atmHistory)
         {
-            boolean isSpecialDay = atmDayTransaction.isPayday() ||  atmDayTransaction.isMonthEnd() || atmDayTransaction.isPublicHoliday();
+            boolean isSpecialDay = atmDayLog.isPayday() ||  atmDayLog.isMonthEnd() || atmDayLog.isPublicHoliday();
             if(isSpecialDay)
             {
-                specialDaysTotal += atmDayTransaction.getWithdrawalAmount();
+                //Handle special days
+                specialDaysTotal += atmDayLog.getWithdrawalAmount();
                 specialDaysCount++;
             }else
             {
                 //Handle normal days
-                normalDaysTotal += atmDayTransaction.getWithdrawalAmount();
+                normalDaysTotal += atmDayLog.getWithdrawalAmount();
                 normalDaysCount++;
             }
         }
@@ -95,10 +100,12 @@ public class CashShortagePredictor {
      * Calculates the predicted amount that will likely be withdrawn from the ATM per day.
      * @param atm
      */
-    public double calculatePredictedDailyWithdrawal(ATM atm) {
+    public double calculatePredictedDailyWithdrawal(ATM atm)
+    {
 
-        ATMDayTransaction today = atm.getLatestRecord();
-        if (today == null) {
+        ATMDayLog today = atm.getLatestRecord();
+        if (today == null)
+        {
             throw new IllegalStateException("Cannot predict with no history for " + atm.getId());
         }
         double recentAverage = calculateRecentAverage(atm);
@@ -112,9 +119,10 @@ public class CashShortagePredictor {
      * Predicts how many hours the ATM has likely before its cash balance reaches zero.
      * @param atm
      */
-    public double predictHoursToEmpty(ATM atm) {
+    public double predictHoursToNoCash(ATM atm)
+    {
 
-        ATMDayTransaction today = atm.getLatestRecord();
+        ATMDayLog today = atm.getLatestRecord();
 
         double predictedDailyWithdrawal = calculatePredictedDailyWithdrawal(atm);
 
@@ -132,9 +140,10 @@ public class CashShortagePredictor {
     /**
      * Determines a risk level based on the predicted time until the ATM runs out of cash.
      */
-    public String determineRiskLevel(ATM atm) {
+    public String determineRiskLevel(ATM atm)
+    {
 
-        double hoursToNoCash = predictHoursToEmpty(atm);
+        double hoursToNoCash = predictHoursToNoCash(atm);
 
         double currentBalance = atm.getLatestRecord().getClosingBalance();
 
@@ -154,13 +163,15 @@ public class CashShortagePredictor {
 
             riskLevel = "Medium";
 
-        } else {
+        } else
+        {
 
             riskLevel = "Low";
         }
 
-        // Safety-percentage rule overrides the calculated risk
-        if (percentOfCapacity < SAFETY_PERCENTAGE) {
+        // 15% Safety-percentage rule overrides the calculated risk
+        if (percentOfCapacity < SAFETY_PERCENTAGE)
+        {
 
             riskLevel = "Critical";
         }
@@ -168,30 +179,31 @@ public class CashShortagePredictor {
         return riskLevel;
     }
 
-
-    private static final double[] CAPACITY_MILESTONES = {50.0, 25.0, 15.0};
-
     /**
-     * Fires a warning the first time an ATM's balance drops below each
-     * capacity milestone — 50%, then 25%, then 15%. Each milestone only
-     * fires once per dip; if the ATM recovers back above a milestone
-     * (e.g. after a refill), that milestone can fire again on the next
-     * decline.
+     * Fires an early warning the first time an ATM's balance drops below each
+     *  50%,25%, and 15% capacity
+     *
      */
-    public List<RiskSnapshot> buildCapacityWarnings(ATM atm) {
-        List<RiskSnapshot> warnings = new ArrayList<>();
-        boolean[] fired = new boolean[CAPACITY_MILESTONES.length];
+    public List<Warning> buildCapacityWarnings(ATM atm)
+    {
+        List<Warning> warnings = new ArrayList<>();
+        boolean[] fired = new boolean[WARNING_PERCENTAGES.length]; // only three warning thresholds
 
-        for (ATMDayTransaction day : atm.getAtmTransactionHistory()) {
-            double percentOfCapacity = (day.getClosingBalance() / atm.getMaxCashCapacity()) * 100;
+        for (ATMDayLog log : atm.getAtmTransactionHistory())
+        {
+            double percentOfCapacity = (log.getClosingBalance
+                    () / atm.getMaxCashCapacity()) * 100;
 
-            for (int i = 0; i < CAPACITY_MILESTONES.length; i++) {
-                if (!fired[i] && percentOfCapacity < CAPACITY_MILESTONES[i]) {
-                    warnings.add(new RiskSnapshot(day.getDate(),
-                            "Balance dropped below " + (int) CAPACITY_MILESTONES[i] + "% of capacity"));
+            for (int i = 0; i < WARNING_PERCENTAGES.length; i++)
+            {
+                if (!fired[i] && percentOfCapacity < WARNING_PERCENTAGES[i])
+                {
+                    warnings.add(new Warning(log.getDate(),
+                            "Balance dropped below " + (int) WARNING_PERCENTAGES[i] + "% of capacity"));
                     fired[i] = true;
                 }
-                if (fired[i] && percentOfCapacity >= CAPACITY_MILESTONES[i]) {
+                if (fired[i] && percentOfCapacity >= WARNING_PERCENTAGES[i])
+                {
                     fired[i] = false;
                 }
             }
@@ -203,8 +215,9 @@ public class CashShortagePredictor {
      * Returns the 5 most recent capacity warnings, newest first — this
      * is what the dashboard's warnings panel displays.
      */
-    public List<RiskSnapshot> lastFiveWarnings(ATM atm) {
-        List<RiskSnapshot> warnings = buildCapacityWarnings(atm);
+    public List<Warning> lastFiveWarnings(ATM atm)
+    {
+        List<Warning> warnings = buildCapacityWarnings(atm);
         Collections.reverse(warnings);
         return warnings.stream().limit(5).collect(Collectors.toList());
     }

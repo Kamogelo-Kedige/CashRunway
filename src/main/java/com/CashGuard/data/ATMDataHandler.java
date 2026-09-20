@@ -1,7 +1,7 @@
 package com.CashGuard.data;
 
 import com.CashGuard.model.ATM;
-import com.CashGuard.model.ATMDayTransaction;
+import com.CashGuard.model.ATMDayLog;
 import com.CashGuard.model.Denomination;
 
 import java.io.BufferedReader;
@@ -19,8 +19,8 @@ public class ATMDataHandler
     //Add a method to read in a file containing transactions from the atm
     public static ATM loadDataFromFile(String path, double maxCashCapacity)
     {
-        //list of transaction records from atm
-        List<ATMDayTransaction> transactions = new ArrayList<>();
+        //list of transactions from atm
+        List<ATMDayLog> logs = new ArrayList<>();
         //ATM particulars
         String id = null;
         String location = "";
@@ -47,9 +47,9 @@ public class ATMDataHandler
                 }
 
                 //get rest of the data from csv file
-                ATMDayTransaction transaction = getTransaction(tokens);
-                //add to list of day transactions
-                transactions.add(transaction);
+                ATMDayLog log = getTransaction(tokens);
+                //add to list of day logs
+                logs.add(log);
 
             }
 
@@ -58,14 +58,14 @@ public class ATMDataHandler
             throw new IllegalStateException("Unable to load ATM data from " + path, e);
         }
 
-        return new ATM(id,location,maxCashCapacity,transactions);
+        return new ATM(id,location,maxCashCapacity, logs);
     }
 
     //helper method to get the rest of the data from the remaining columns
-    private static ATMDayTransaction getTransaction(String[] tokens) {
-        ATMDayTransaction transaction = new ATMDayTransaction();
+    private static ATMDayLog getTransaction(String[] tokens) {
+        ATMDayLog transaction = new ATMDayLog();
 
-        transaction.setDate(LocalDate.parse(tokens[2]));
+
         transaction.setDate(LocalDate.parse(tokens[2]));
         transaction.setWithdrawalAmount(Double.parseDouble(tokens[3]));
         transaction.setDenominationBreakdown(new Denomination(
@@ -82,5 +82,5 @@ public class ATMDataHandler
         transaction.setPublicHoliday(Boolean.parseBoolean(tokens[14]));
         return transaction;
     }
-    //Man
+
 }

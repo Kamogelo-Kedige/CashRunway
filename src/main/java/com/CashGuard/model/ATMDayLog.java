@@ -1,18 +1,18 @@
-package com.CashGuard.ATM;
+package com.CashGuard.model;
 
 import java.time.LocalDate;
 
 /**
  * Represents a single day's worth of transaction activities for a specific ATM
  */
-public class ATMDayTransaction
+public class ATMDayLog
 {
     //Private Attributes
     private LocalDate date;
     private double withdrawalAmount;
     private double deposits;
     private double closingBalance;
-    private boolean downtime;
+    private boolean downtime; // gotta use this
     private boolean isPayday;
     private boolean isMonthEnd;
     private boolean isPublicHoliday;
@@ -21,7 +21,7 @@ public class ATMDayTransaction
     /**
      *No args constructor
      */
-    public  ATMDayTransaction()
+    public ATMDayLog()
     {}
 
     /**
@@ -36,7 +36,7 @@ public class ATMDayTransaction
      * @param isPublicHoliday
      * @param denominationBreakdown
      */
-    public ATMDayTransaction(LocalDate date, double withdrawalAmount, double deposits, boolean downtime, double closingBalance, boolean isPayday, boolean isMonthEnd, boolean isPublicHoliday, Denomination denominationBreakdown)
+    public ATMDayLog(LocalDate date, double withdrawalAmount, double deposits, boolean downtime, double closingBalance, boolean isPayday, boolean isMonthEnd, boolean isPublicHoliday, Denomination denominationBreakdown)
     {
         this.date = date;
         this.withdrawalAmount = withdrawalAmount;
@@ -68,7 +68,8 @@ public class ATMDayTransaction
 
     public double getDeposits() {
         return deposits;
-    }
+    } // gotta use this insert a deposit line,//gotta have the first deposit
+
 
     public void setDeposits(double deposits) {
         this.deposits = deposits;

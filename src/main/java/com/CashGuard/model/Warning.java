@@ -8,4 +8,4 @@ import java.time.LocalDate;
  * or the balance crossed a capacity milestone.
  * Used for displaying dashboard warnings
  */
-public record RiskSnapshot(LocalDate date, String message) { }
+public record Warning(LocalDate date, String message) { }
