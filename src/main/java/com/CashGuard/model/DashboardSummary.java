@@ -20,5 +20,6 @@ public record DashboardSummary(String atmId,
                                Map<LocalDate, Double> withdrawalTrend,
                                Map<LocalDate, Double> balanceTrend,
                                Map<LocalDate, Double> depositTrend,
+                               double availabilityPercent,
                               List<Warning> recentWarnings)
 { }

@@ -72,5 +72,22 @@ public class TrendAnalyser
         }
         return depositSeries;
     }
+
+
+    /**
+     * Percentage of days in the ATM's history where it was NOT in
+     * downtime
+     */
+    public double calculateAvailabilityPercent(ATM atm) {
+        List<ATMDayLog> history = atm.getAtmTransactionHistory();
+
+        if (history == null || history.isEmpty()) {
+            throw new IllegalStateException("Cannot calculate availability with no history for " + atm.getId());
+        }
+
+        long downDays = history.stream().filter(ATMDayLog::isDowntime).count();
+        double upDays = history.size() - downDays;
+        return (upDays / history.size()) * 100;
+    }
 }
 

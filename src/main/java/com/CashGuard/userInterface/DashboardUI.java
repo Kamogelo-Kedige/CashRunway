@@ -63,7 +63,7 @@ public class DashboardUI
     }
 
     private static HBox buildHeader(ComboBox<String> atmSelector) {
-        Label title = new Label("CashRunway dashboard");
+        Label title = new Label("CashRunway");
         title.getStyleClass().add("app-title");
 
         HBox spacer = new HBox();
@@ -78,8 +78,9 @@ public class DashboardUI
         VBox riskCard = buildRiskCard(summary);
 
         HBox kpiCards = new HBox(12,
-                buildKpiCard("Current balance", "R" + String.format("%,.0f", summary.currentBalance())),
-                buildKpiCard("% of capacity", String.format("%.1f%%", summary.percentOfCapacity())),
+                buildKpiCard("Current Balance", "R" + String.format("%,.0f", summary.currentBalance())),
+                buildKpiCard("Capacity Remaining %", String.format("%.1f%%", summary.percentOfCapacity())),
+                buildAvailabilityCard(summary),
                 buildActionCard(summary)
         );
         HBox.setHgrow(kpiCards, Priority.ALWAYS);
@@ -88,7 +89,7 @@ public class DashboardUI
     }
 
     private static VBox buildActionCard(DashboardSummary summary) {
-        Label label = new Label("Recommended action");
+        Label label = new Label("Recommended Action");
         label.getStyleClass().add("kpi-label");
 
         // this is the line you were asking about — it replaces the plain
@@ -105,14 +106,14 @@ public class DashboardUI
 
 
     private static VBox buildRiskCard(DashboardSummary summary) {
-        Label label = new Label("Risk level");
+        Label label = new Label("Risk Level");
         label.getStyleClass().add("kpi-label");
 
         Label value = new Label(summary.riskLevel().toUpperCase());
         value.getStyleClass().addAll("risk-badge", "risk-" + summary.riskLevel().toLowerCase().replace(" ", "-"));
 
         String hoursText = summary.hoursToNoCash() < 0
-                ? "hours to empty: N/A"
+                ? "Hours To Empty: N/A"
                 : summary.riskLevel().equalsIgnoreCase("Critical")
                   ? "hours to empty: < 24h"
                   : "hours to empty: " + Math.round(summary.hoursToNoCash());
@@ -155,7 +156,7 @@ public class DashboardUI
         yAxis.setLabel("Amount (R)");
 
         AreaChart<Number, Number> chart = new AreaChart<>(xAxis, yAxis);
-        chart.setTitle("30-day balance & deposit trend");
+        chart.setTitle("30-day balance & withdrawal trend");
         chart.setLegendVisible(true);
         chart.setCreateSymbols(false);
         chart.getStyleClass().add("trend-chart");
@@ -166,15 +167,24 @@ public class DashboardUI
             balanceSeries.getData().add(new XYChart.Data<>(entry.getKey().getDayOfMonth(), entry.getValue()));
         }
 
-        XYChart.Series<Number, Number> depositSeries = new XYChart.Series<>();
-        depositSeries.setName("Deposits");
-        for (Map.Entry<LocalDate, Double> entry : summary.depositTrend().entrySet()) {
-            depositSeries.getData().add(new XYChart.Data<>(entry.getKey().getDayOfMonth(), entry.getValue()));
+        // Balance only ever trends downward between refills, so payday
+        // activity only shows up there as a steeper slope. Plotting the
+        // withdrawal amount itself is what actually shows an upward spike
+        // on payday/month-end/holiday dates — the thing we want visible.
+        XYChart.Series<Number, Number> withdrawalSeries = new XYChart.Series<>();
+        withdrawalSeries.setName("Daily withdrawals");
+        for (Map.Entry<LocalDate, Double> entry : summary.withdrawalTrend().entrySet()) {
+            withdrawalSeries.getData().add(new XYChart.Data<>(entry.getKey().getDayOfMonth(), entry.getValue()));
         }
 
-        chart.getData().addAll(balanceSeries, depositSeries);
+        chart.getData().addAll(balanceSeries, withdrawalSeries);
 
-        VBox panel = new VBox(chart);
+        //The day the ATM received
+        Map.Entry<LocalDate, Double> peakDeposit = summary.depositTrend().entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
+
+        VBox panel = new VBox(6, chart);
         panel.getStyleClass().add("card");
         HBox.setHgrow(panel, Priority.ALWAYS);
         return panel;
@@ -200,18 +210,16 @@ public class DashboardUI
         series.getData().add(new XYChart.Data<>("R200", d.r200()));
         chart.getData().add(series);
 
-        // Grand total across all denominations
-        Label total = new Label("Total cash dispensed: R" + String.format("%,.0f", d.total()));
-        total.getStyleClass().add("kpi-sub");
 
-        VBox panel = new VBox(6, chart, total);
+
+        VBox panel = new VBox(6, chart);
         panel.getStyleClass().add("card");
         HBox.setHgrow(panel, Priority.ALWAYS);
         return panel;
     }
 
     private static VBox buildWarningsPanel(DashboardSummary summary) {
-        Label header = new Label("Warnings (most recent first)");
+        Label header = new Label("Early Warnings");
         header.getStyleClass().add("section-heading");
 
         VBox panel = new VBox(8, header);
@@ -241,6 +249,26 @@ public class DashboardUI
         if (message.contains("High") || message.contains("25%")) return "high";
         if (message.contains("Medium") || message.contains("50%")) return "medium";
         return "neutral";
+    }
+
+    /**
+     * Shows the ATM's uptime percentage, derived from the Downtime field
+     * in the source data. Directly answers the case study's "keep ATM
+     * availability above 99%" goal — colour-coded so a panel can see at
+     * a glance whether an ATM is meeting that target.
+     */
+    private static VBox buildAvailabilityCard(DashboardSummary summary) {
+        Label label = new Label("ATM Availability");
+        label.getStyleClass().add("kpi-label");
+
+        Label value = new Label(String.format("%.1f%%", summary.availabilityPercent()));
+        String styleClass = summary.availabilityPercent() >= 99.0 ? "action-low" : "action-critical";
+        value.getStyleClass().addAll("kpi-value", styleClass);
+
+        VBox card = new VBox(4, label, value);
+        card.getStyleClass().add("card");
+        HBox.setHgrow(card, Priority.ALWAYS);
+        return card;
     }
 
 }

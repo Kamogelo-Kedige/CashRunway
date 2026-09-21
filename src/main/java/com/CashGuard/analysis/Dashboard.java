@@ -38,6 +38,7 @@ public class Dashboard {
                 trendAnalyzer.dailyWithdrawalSeries(atm),
                 trendAnalyzer.dailyBalanceSeries(atm),
                 trendAnalyzer.dailyDepositSeries(atm),
+                trendAnalyzer.calculateAvailabilityPercent(atm),
                 warnings
         );
 
