@@ -89,15 +89,16 @@ public class DashboardUI
     }
 
     private static VBox buildActionCard(DashboardSummary summary) {
-        Label label = new Label("Recommended Action");
+        Label label = new Label("Recommended action");
         label.getStyleClass().add("kpi-label");
 
-        // this is the line you were asking about — it replaces the plain
-        // "kpi-value" label that buildKpiCard would have created
         Label action = new Label(summary.recommendedAction());
         action.getStyleClass().addAll("kpi-value", "action-" + summary.riskLevel().toLowerCase().replace(" ", "-"));
 
-        VBox card = new VBox(4, label, action);
+        Label loadAmount = new Label("Load: R" + String.format("%,.0f", summary.recommendedLoadAmount()));
+        loadAmount.getStyleClass().add("kpi-sub");
+
+        VBox card = new VBox(4, label, action, loadAmount);
         card.getStyleClass().add("card");
         HBox.setHgrow(card, Priority.ALWAYS);
         return card;

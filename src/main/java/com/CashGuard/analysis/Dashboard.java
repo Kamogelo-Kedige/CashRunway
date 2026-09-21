@@ -33,6 +33,7 @@ public class Dashboard {
                 currentBalance,
                 percentOfCapacity,
                 recommendedAction(riskLevel),
+                Math.round((atm.getMaxCashCapacity() - currentBalance) / 10.0) * 10.0,
                 denominationAnalyzer.mostUsedDenomination(atm),
                 denominationAnalyzer.totalByDenomination(atm),
                 trendAnalyzer.dailyWithdrawalSeries(atm),
