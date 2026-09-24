@@ -45,15 +45,15 @@ public class Main extends Application {
         // lists them Mall, Township, Taxi Rank — not shuffled.
         Map<String, DashboardSummary> summaries = new LinkedHashMap<>();
 
-        ATM mall = ATMDataHandler.loadDataFromFile("src/main/resources/atm_mall.csv", 500000);
+        ATM mall = ATMDataHandler.loadDataFromResource("/atm_mall.csv", 500000);
         summaries.put(mall.getLocation(), dashboard.build(mall));
 
 
-        ATM township = ATMDataHandler.loadDataFromFile("src/main/resources/atm_township.csv", 300000);
+        ATM township = ATMDataHandler.loadDataFromResource("/atm_township.csv", 300000);
         summaries.put(township.getLocation(), dashboard.build(township));
 
 
-        ATM taxiRank = ATMDataHandler.loadDataFromFile("src/main/resources/atm_taxirank.csv", 150000);
+        ATM taxiRank = ATMDataHandler.loadDataFromResource("/atm_taxirank.csv", 150000);
         summaries.put(taxiRank.getLocation(), dashboard.build(taxiRank));
 
         primaryStage.setScene(DashboardUI.buildMainScene(summaries));
