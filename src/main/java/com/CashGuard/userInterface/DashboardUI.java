@@ -180,10 +180,12 @@ String hoursText = summary.hoursToNoCash() < 0 || summary.hoursToNoCash() == Dou
 
         chart.getData().addAll(balanceSeries, withdrawalSeries);
 
-        //The day the ATM received
-        Map.Entry<LocalDate, Double> peakDeposit = summary.depositTrend().entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .orElse(null);
+XYChart.Series<Number, Number> depositSeries = new XYChart.Series<>();
+        depositSeries.setName("Daily deposits");
+        for (Map.Entry<LocalDate, Double> entry : summary.depositTrend().entrySet()) {
+            depositSeries.getData().add(new XYChart.Data<>(entry.getKey().getDayOfMonth(), entry.getValue()));
+        }
+        chart.getData().add(depositSeries);
 
         VBox panel = new VBox(6, chart);
         panel.getStyleClass().add("card");
