@@ -1,4 +1,8 @@
-package com.CashGuard.ATM;
+package com.CashGuard.analysis;
+
+import com.CashGuard.model.ATM;
+import com.CashGuard.model.ATMDayLog;
+import com.CashGuard.model.Denomination;
 
 import java.util.List;
 
@@ -11,7 +15,7 @@ public class DenominationAnalyser {
      * Adds up the total Rand value withdrawn in each denomination across the ATM's entire history.
      */
     public Denomination totalByDenomination(ATM atm) {
-        List<ATMDayTransaction> history = atm.getAtmTransactionHistory();
+        List<ATMDayLog> history = atm.getAtmTransactionHistory();
 
         if (history == null || history.isEmpty()) {
             throw new IllegalStateException("Cannot analyse denominations with no history for " + atm.getId());
@@ -19,7 +23,7 @@ public class DenominationAnalyser {
 
         double totalR10 = 0, totalR20 = 0, totalR50 = 0, totalR100 = 0, totalR200 = 0;
 
-        for (ATMDayTransaction record : history) {
+        for (ATMDayLog record : history) {
             Denomination denomination = record.getDenominationBreakdown();
 
             // safety check so, loop doesn't crash

@@ -1,0 +1,123 @@
+.dashboard-root {
+    -fx-background-color: linear-gradient(to bottom, #F0F3F8, #E6E9EF);
+}
+
+.header-bar {
+    -fx-alignment: center-left;
+    -fx-padding: 18 24 18 24;
+    -fx-background-color: linear-gradient(to right, #002D7A, #003DA5);
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,61,165,0.35), 12, 0, 0, 3);
+}
+
+.app-title {
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: transparent;
+    -fx-padding: 18;
+    -fx-effect: dropshadow(gaussian, rgba(20,30,60,0.10), 14, 0, 0, 4);
+}
+
+.kpi-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #2A3B5C;
+    -fx-font-weight: bold;
+}
+
+.kpi-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #10141C;
+}
+
+.kpi-sub {
+    -fx-font-size: 12px;
+    -fx-text-fill: #7A8699;
+}
+
+.section-heading {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #10141C;
+    -fx-padding: 0 0 6 0;
+}
+
+.risk-badge {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20 8 20;
+    -fx-background-radius: 24;
+    -fx-alignment: center;
+}
+
+.risk-low { -fx-text-fill: white; -fx-background-color: linear-gradient(to right, #1E8449, #27AE60); }
+.risk-medium { -fx-text-fill: white; -fx-background-color: linear-gradient(to right, #B7791F, #E2A93B); }
+.risk-high { -fx-text-fill: white; -fx-background-color: linear-gradient(to right, #C0392B, #E05A46); }
+.risk-critical { -fx-text-fill: white; -fx-background-color: linear-gradient(to right, #8E1C12, #C0392B); }
+.risk-insufficient-data { -fx-text-fill: #444; -fx-background-color: #E5E7EB; }
+
+.warning-entry {
+    -fx-font-size: 13px;
+    -fx-text-fill: #374151;
+    -fx-padding: 8 0 8 12;
+    -fx-border-color: transparent transparent #EEF0F3 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Trend chart  filled area with a soft gradient under the line.
+   Series 0 (balance) and series 1 (deposits) are styled separately
+   so the two lines are visually distinguishable, not just labelled
+   in the legend. */
+.trend-chart .series0 .chart-series-area-line {
+    -fx-stroke: #003DA5;
+    -fx-stroke-width: 2.5px;
+}
+.trend-chart .series0 .chart-series-area-fill {
+    -fx-fill: linear-gradient(to bottom, rgba(0,61,165,0.35), rgba(0,61,165,0.02));
+}
+.trend-chart .series1 .chart-series-area-line {
+    -fx-stroke: #C0392B;
+    -fx-stroke-width: 2px;
+}
+.trend-chart .series1 .chart-series-area-fill {
+    -fx-fill: linear-gradient(to bottom, rgba(192,57,43,0.30), rgba(192,57,43,0.02));
+}
+.chart-plot-background { -fx-background-color: #FAFBFC; }
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines { -fx-stroke: #EEF0F3; }
+.chart-title { -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #10141C; }
+.axis-label { -fx-font-size: 11px; -fx-text-fill: #7A8699; }
+.axis-tick-mark, .axis-minor-tick-mark { -fx-stroke: #D5D9E0; }
+
+/* Denomination bars — gradient fill, one shared accent family */
+.chart-bar {
+    -fx-background-color: #002D7A;
+    -fx-background-radius: 4 4 0 0;
+}
+
+.combo-box {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #D1D5DB;
+    -fx-border-radius: 8;
+    -fx-padding: 2;
+}
+.combo-box:hover {
+    -fx-border-color: #003DA5;
+}
+
+.action-low { -fx-text-fill: #1E8449; }
+.action-medium { -fx-text-fill: #B7791F; }
+.action-high { -fx-text-fill: #C0392B; }
+.action-critical { -fx-text-fill: #8E1C12; -fx-font-weight: bold; }
+.action-insufficient-data { -fx-text-fill: #5F6368; }
+
+.hours-to-empty {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}

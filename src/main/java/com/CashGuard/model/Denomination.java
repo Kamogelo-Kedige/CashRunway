@@ -1,4 +1,4 @@
-package com.CashGuard.ATM;
+package com.CashGuard.model;
 
 
 /**
