@@ -23,4 +23,11 @@ public record DashboardSummary(String atmId,
                                Map<LocalDate, Double> depositTrend,
                                double availabilityPercent,
                               List<Warning> recentWarnings)
-{ }
+{
+    public DashboardSummary {
+        withdrawalTrend = java.util.Collections.unmodifiableMap(new java.util.LinkedHashMap<>(withdrawalTrend));
+        balanceTrend = java.util.Collections.unmodifiableMap(new java.util.LinkedHashMap<>(balanceTrend));
+        depositTrend = java.util.Collections.unmodifiableMap(new java.util.LinkedHashMap<>(depositTrend));
+        recentWarnings = List.copyOf(recentWarnings);
+    }
+}
