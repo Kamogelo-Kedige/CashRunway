@@ -113,7 +113,7 @@ public class DashboardUI
         Label value = new Label(summary.riskLevel().toUpperCase());
         value.getStyleClass().addAll("risk-badge", "risk-" + summary.riskLevel().toLowerCase().replace(" ", "-"));
 
-        String hoursText = summary.hoursToNoCash() < 0
+String hoursText = summary.hoursToNoCash() < 0 || summary.hoursToNoCash() == Double.MAX_VALUE
                 ? "Hours To Empty: N/A"
                 : summary.riskLevel().equalsIgnoreCase("Critical")
                   ? "hours to empty: < 24h"
